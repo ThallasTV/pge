@@ -3625,10 +3625,9 @@ static int boundingCircleInterpenetrates (broadphase b)
   interpen_interCircle c1 = interpen_initCircle (r1, p1);
 
   return interpen_circleCollide (c0, c1);
-
-
-
 }
+
+
 
 static int optBroadphaseFrameCanCull (broadphase b)
 {

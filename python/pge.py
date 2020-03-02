@@ -289,6 +289,14 @@ class object:
         # print "returning from fix"
         return self
 
+    def rotate (self, angle):
+        self._check_type ([box_t, circle_t], "change angle of a")
+        self._check_not_deleted ("changing angle")
+        self.o = self._check_same (pgeif.rotate(self.o, angle))
+        print("returning from angle")
+        return self
+
+
     #
     #  unfix - Pre-condition:  the object is either a circle or polygon
     #          which exists in level 0.

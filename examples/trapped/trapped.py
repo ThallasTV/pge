@@ -47,10 +47,8 @@ def placeBall (kind, x, y, r):
     return pge.circle (x, y, r, kind)
 
 
-def placeBox (p0, p1, p2, p3, colour):
-    t = pge.poly4 (p0[0], p0[1], p1[0], p1[1],
-                   p2[0], p2[1], p3[0], p3[1], colour)
-    t.fix ()
+def placeBox (p, w, c):
+    return pge.box (p[0], p[1], w, w, c)
 
 def push_it (o, e):
     p = e.collision_between ()
@@ -129,7 +127,7 @@ def mouse_hit (e):
 def main ():
     global gb, sides
 
-    f = placeBall (wood_light, 0.95, 0.05, 0.1).fix ()
+   # f = placeBall (wood_light, 0.95, 0.05, 0.1).fix ()
     # l = placeBox ([0.3, 0.3], [0.3, 0.5], [0.5, 0.5], [0.5, 0.3], white)
     t1 = placeTriangle ([0.2, 0.3], [0.4, 0.3], [0.3, 0.4], white)
     t2 = placeTriangle ([0.6, 0.3], [0.8, 0.3], [0.7, 0.4], white)
@@ -138,10 +136,12 @@ def main ():
     for b in [b1, b2, b3, b4]:
         b.on_collision (play_crack)
     box_of (boarder, [0.1, 0.08], 0.2, wood_light)
-    gb = placeBall (gold, 0.19, 0.7, 0.05).mass (1.25).on_collision_with (sides, delete_it)
-    sb = placeBall (steel, 0.57, 0.8, 0.05).mass (1).on_collision_with (sides, delete_it)
-    cb = placeBall (copper, 0.81, 0.8, 0.05).mass (.75).on_collision_with (sides, delete_it)
+    #gb = placeBall (gold, 0.19, 0.7, 0.05).mass (1.25).on_collision_with (sides, delete_it)
+    #sb = placeBall (steel, 0.57, 0.8, 0.05).mass (1).on_collision_with (sides, delete_it)
+    #cb = placeBall (copper, 0.81, 0.8, 0.05).mass (.75).on_collision_with (sides, delete_it)
     placeSilos ()
+
+    placeBox ([0.47, 0.7], 0.1, blue).mass (10.0)
 
     print("before run")
     pge.gravity ()
