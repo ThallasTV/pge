@@ -26,7 +26,9 @@ fps_text = None
 last_fps = 0
 angle = 0
 pi2 = (3.14*2)
-t1 = None
+t = None
+r2 = None
+
 
 def myquit (e):
     print("Goodbye!")
@@ -48,14 +50,15 @@ def placeBall (kind, x, y, r):
     return pge.circle (x, y, r, kind)
 
 def placeRamps ():
+    global r2
    ## r1 = pge.poly4 (0.05 , 0.4,
      #               0.6, 0.4,
       #              0.6, 0.4,
        #             0.05 ,0.46, blue).fix ()
-    r2 = pge.poly4 (0.15, 0.6,
-                    0.75, 0.6,
-                    0.75, 0.6,
-                    0.15, 0.6, wood_dark).fix ()
+    r2 = pge.poly4 (0.30, 0.6,
+                    0.60, 0.58,
+                    0.60, 0.57,
+                    0.30, 0.59, green).fix ()
 
 
 def push_it (o, e):
@@ -67,19 +70,15 @@ def push_it (o, e):
                 i.put_yvel (i.get_yvel () * 1.15)
 
 
-def timer (e = None, f = None):
-    global angle, t1
-    print ("timer called: ", angle)
-    angle += 20
-    angle = angle % 360
-    t1.rotate (angle * pi2 / 360.0)
-    pge.at_time (0.1, timer)
-
 def placeTriangle (p0, p1, p2, colour):
-    global t1
-    t1 = pge.poly3 (p0[0], p0[1], p1[0], p1[1], p2[0], p2[1], colour).on_collision (push_it).fix ()
+    t = pge.poly3 (p0[0], p0[1], p1[0], p1[1], p2[0], p2[1], colour).on_collision (push_it).fix ()
+    return t
+    t2 = pge.poly3 (p0[0], p0[1], p1[0], p1[1], p2[0], p2[1], colour).on_collision (push_it).fix ()
 
-
+def displayTriangle ():
+    global t1, t2
+    t1 = placeTriangle ([0.2+0.55, 0.3+0.3], [0.4+0.55, 0.3+0.3], [0.3+0.55, 0.4+0.3], white)
+    t2 = placeTriangle ([0.0, 0.6], [0.2, 0.6], [0.1, 0.7], blue)
 
 
 def mouse_hit (e):
@@ -102,14 +101,14 @@ def snap_it (e, o):
 def drop_gb (e, o):
     gb = placeBall (gold, 0.7, 0.92, 0.03).mass (2.0)
     print("Ball is dropped")
-    pge.at_time (6.0, drop_gb)
+    pge.at_time (8.0, drop_gb)
 
 def placeSilos ():
     for x in [0.1, 0.2]:
-        pge.poly4 (x, 0.0,
-                   x, 0.07,
-                   x+0.01, 0.07,
-                   x+0.01, 0.0, red).fix ()
+       # pge.poly4 (x, 0.0,
+       #            x, 0.07,
+       #            x+0.01, 0.07,
+       #            x+0.01, 0.0, red).fix ()
 
         pge.poly4 (x+0.25, 0.0,
                    x+0.25, 0.07,
@@ -126,6 +125,30 @@ def placeSilos ():
                    x+0.76, 0.07,
                    x+0.76, 0.0, yellow).fix ()
 
+def box_of (thickness, pos, width, color):
+    global captured, sides
+
+    floor = pge.box (pos[0], pos[1], width, thickness, color).fix ()
+    left = pge.box (pos[0], pos[1], thickness, width, color).fix ()
+    right = pge.box (pos[0]+width-thickness, pos[1], thickness, width, color).fix ()
+    top = pge.box (pos[0], pos[1]+width-thickness, width, thickness, color).fix ()
+    sides = [floor, left, right, top]
+    captured = placeBall (blue_dark, pos[0]+2.0*thickness+0.05, pos[1]+1.0*thickness+0.05, 0.05).mass (1.5)
+    #captured = placeTriangle ([0.2, 0.1], [0.4, 0.1], [0.3, 0.1], blue)
+
+def timer (e = None, f = None):
+    global angle, t1, t2, r2
+    print ("timer called: ", angle)
+    angle += 1
+    angle = angle % 360
+    print (t1)
+    print (t2)
+    t1.rotate (angle * pi2 / 360.0)
+    t2.rotate (angle * pi2 / 360.0)
+    r2.rotate (angle * pi2 / 360.0)
+    pge.at_time (0.01, timer)
+
+
 
 def main ():
     global gb, sides, springs
@@ -135,13 +158,15 @@ def main ():
     snap_length = 1.0
 
     placeBoarders (0.01, wood_dark)
-   # placeRamps ()
+    placeRamps ()
     placeSilos ()
-   # t1 = placeTriangle ([0.2, 0.3+0.3], [0.4, 0.3+0.3], [0.3, 0.4+0.3], white)
-    placeTriangle ([0.2, 0.3+0.3], [0.4, 0.3+0.3], [0.3, 0.4+0.3], white)
+  #  placeTriangle ([0.2, 0.3+0.3], [0.4, 0.3+0.3], [0.3, 0.4+0.3], white)
+    displayTriangle()
     timer ()
+
     left = placeBall (wood_light, 0.05, 0.45, 0.03).fix ()
     right = placeBall (wood_light, 0.95, 0.45, 0.03).fix ()
+    box_of (boarder, [0.1, 0.08], 0.2, wood_light)
 
     prev = left
     springs = []
@@ -160,7 +185,7 @@ def main ():
     print("before run")
     pge.record ()
     pge.draw_collision (True, False)
-    pge.collision_colour (red)
+    pge.collision_colour (blue)
     pge.gravity ()
     pge.dump_world ()
     pge.slow_down (2.5)  # slows down real time by a factor of
